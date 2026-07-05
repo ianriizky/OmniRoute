@@ -124,3 +124,31 @@ test("publicUrl with ws:// scheme is accepted", async () => {
   const body = (await response.json()) as any;
   assert.equal(body.live.publicUrl, "ws://lan-host:20132/live-ws");
 });
+
+test("handshake path is derived from NEXT_PUBLIC_LIVE_WS_PUBLIC_URL pathname", async () => {
+  process.env.NEXT_PUBLIC_LIVE_WS_PUBLIC_URL = "wss://ws.my-ai.com/my-custom-ws";
+
+  const response = await wsRoute.GET(
+    new Request("http://localhost/api/v1/ws?handshake=1", {
+      headers: { origin: "http://localhost" },
+    })
+  );
+
+  assert.equal(response.status, 200);
+  const body = (await response.json()) as any;
+  assert.equal(body.live.path, "/my-custom-ws");
+});
+
+test("handshake path defaults to /live-ws when NEXT_PUBLIC_LIVE_WS_PUBLIC_URL is unset", async () => {
+  delete process.env.NEXT_PUBLIC_LIVE_WS_PUBLIC_URL;
+
+  const response = await wsRoute.GET(
+    new Request("http://localhost/api/v1/ws?handshake=1", {
+      headers: { origin: "http://localhost" },
+    })
+  );
+
+  assert.equal(response.status, 200);
+  const body = (await response.json()) as any;
+  assert.equal(body.live.path, "/live-ws");
+});
