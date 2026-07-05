@@ -215,9 +215,8 @@ export async function registerNodejs(): Promise<void> {
     // without this the dashboard mode (auto/custom/adaptive) silently reverts to
     // the passthrough default on every restart. Previously this was only wired into
     // the unused `server-init.ts`, so it never ran in production.
-    const { hydrateThinkingBudgetConfig } = await import(
-      "@omniroute/open-sse/services/thinkingBudget.ts"
-    );
+    const { hydrateThinkingBudgetConfig } =
+      await import("@omniroute/open-sse/services/thinkingBudget.ts");
     if (hydrateThinkingBudgetConfig(settings)) {
       console.log("[STARTUP] Thinking-Budget config restored from settings");
     }
@@ -378,6 +377,16 @@ export async function registerNodejs(): Promise<void> {
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       console.warn("[STARTUP] memory decay sweep failed to start (non-fatal):", msg);
+    }
+
+    // Live dashboard WebSocket server (port 20132).
+    // liveServer.ts auto-starts on import unless OMNIROUTE_ENABLE_LIVE_WS=0
+    // or in build/test mode. In-process so it shares the EventBus singleton.
+    try {
+      await import("@/server/ws/liveServer");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.warn("[STARTUP] Live WS server failed to start (non-fatal):", msg);
     }
   }
 }
