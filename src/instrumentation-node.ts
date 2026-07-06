@@ -379,7 +379,7 @@ export async function registerNodejs(): Promise<void> {
       console.warn("[STARTUP] memory decay sweep failed to start (non-fatal):", msg);
     }
 
-    // Real-time dashboard WebSocket daemon (port 20129): powers Combo Studio Live,
+    // Real-time dashboard WebSocket daemon (port 20132): powers Combo Studio Live,
     // the Home live-pulse, and Live Compression. liveServer.ts auto-starts the
     // daemon on import (gated by OMNIROUTE_ENABLE_LIVE_WS, default ON) — but NOTHING
     // imported it in the packaged standalone/PM2 runtime. Only the unused
